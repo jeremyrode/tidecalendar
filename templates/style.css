@@ -1,25 +1,25 @@
-/* styles.css - Modern Marine Poster Design for Seeed reTerminal E1004 (1600x1200 Landscape) */
+/* style.css - 6-Color Binary RGB Marine Poster Design for Seeed reTerminal E1004 (1600x1200) */
 
 :root {
   --bg-main: #ffffff;
   --bg-card: #ffffff;
   --text-primary: #000000;
-  --text-secondary: #1e293b;
-  --text-muted: #475569;
-  --border-color: #94a3b8;
-  --border-dark: #0f172a;
-  
-  /* Spectra 6 E-Ink Palette Accents (Exact Pigment Values) */
-  --s6-blue: #1d4ed8;
-  --s6-blue-light: #eff6ff;
-  --s6-blue-subtle: #bfdbfe;
-  --s6-yellow: #ca8a04;
-  --s6-yellow-light: #fef08a;
-  --s6-red: #dc2626;
-  --s6-red-light: #fee2e2;
-  --s6-green: #15803d;
-  --s6-green-light: #dcfce7;
-  --s6-dark: #0f172a;
+  --text-secondary: #000000;
+  --text-muted: #000000;
+  --border-color: #000000;
+  --border-dark: #000000;
+
+  /* Spectra 6 Pure Binary RGB Accents (RGB values strictly 0 or 255) */
+  --s6-blue: #0000ff;
+  --s6-blue-light: #ffffff;
+  --s6-blue-subtle: #ffffff;
+  --s6-yellow: #ffff00;
+  --s6-yellow-light: #ffff00;
+  --s6-red: #ff0000;
+  --s6-red-light: #ffffff;
+  --s6-green: #00ff00;
+  --s6-green-light: #ffffff;
+  --s6-dark: #000000;
 }
 
 * {
@@ -35,8 +35,7 @@ body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  padding: 28px 36px;
+  padding: 0px 0px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -47,8 +46,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2.5px solid var(--border-color);
-  padding-bottom: 18px;
+  border-bottom: 3px solid var(--border-color);
+  padding-bottom: 0px;
 }
 
 .header-left {
@@ -61,31 +60,31 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--s6-blue);
 }
 
 .tag-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background-color: var(--s6-blue);
   border-radius: 50%;
 }
 
 .location-title {
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 46px;
+  font-weight: 900;
   letter-spacing: -0.5px;
   color: var(--text-primary);
   line-height: 1.1;
 }
 
 .location-sub {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.5px;
 }
@@ -95,15 +94,15 @@ body {
 }
 
 .date-main {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 40px;
+  font-weight: 900;
   color: var(--text-primary);
   letter-spacing: -0.3px;
 }
 
 .date-sub {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text-secondary);
   margin-top: 2px;
 }
@@ -123,32 +122,32 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
 }
 
 .badge-level-label {
-  font-size: 12px;
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .badge-level-val {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
 }
 
 .badge-trend {
-  font-size: 13px;
-  font-weight: 600;
-  padding: 3px 8px;
+  font-size: 18px;
+  font-weight: 800;
+  padding: 4px 10px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: #0000ff;
+  color: #ffffff;
 }
 
 .next-tide-text {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   color: var(--s6-blue);
 }
 
@@ -165,13 +164,12 @@ body {
 .chart-card {
   flex: 1;
   background: var(--bg-card);
-  border: 2px solid var(--border-color);
+  border: 3px solid var(--border-color);
   border-radius: 16px;
   padding: 20px 24px 16px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
 }
 
 .chart-header {
@@ -182,8 +180,8 @@ body {
 }
 
 .chart-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 900;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -192,8 +190,8 @@ body {
 .chart-legend {
   display: flex;
   gap: 18px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   color: var(--text-muted);
 }
 
@@ -204,14 +202,26 @@ body {
 }
 
 .legend-swatch {
-  width: 14px;
-  height: 10px;
+  width: 16px;
+  height: 12px;
   border-radius: 2px;
 }
 
-.swatch-daylight { background-color: #fef08a; border: 1px solid #ca8a04; }
-.swatch-curve { background-color: var(--s6-blue); height: 3px; }
-.swatch-mllw { border-bottom: 2px dashed #94a3b8; height: 0; width: 16px; }
+.swatch-daylight {
+  background-color: #ffff00;
+  border: 1.5px solid #000000;
+}
+
+.swatch-curve {
+  background-color: var(--s6-blue);
+  height: 4px;
+}
+
+.swatch-mllw {
+  border-bottom: 2.5px dashed #000000;
+  height: 0;
+  width: 18px;
+}
 
 .chart-svg-container {
   width: 100%;
@@ -228,15 +238,14 @@ body {
 
 .side-card {
   background: var(--bg-card);
-  border: 2px solid var(--border-color);
+  border: 3px solid var(--border-color);
   border-radius: 14px;
   padding: 16px 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 
 .side-card-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 900;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -263,34 +272,39 @@ body {
 }
 
 .extreme-item.high {
-  border-left: 5px solid var(--s6-red);
+  border-left: 6px solid var(--s6-red);
 }
 
 .extreme-item.low {
-  border-left: 5px solid var(--s6-blue);
+  border-left: 6px solid var(--s6-blue);
 }
 
 .extreme-type {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 900;
   text-transform: uppercase;
   display: flex;
   justify-content: space-between;
 }
 
-.extreme-type.high { color: var(--s6-red); }
-.extreme-type.low { color: var(--s6-blue); }
+.extreme-type.high {
+  color: var(--s6-red);
+}
+
+.extreme-type.low {
+  color: var(--s6-blue);
+}
 
 .extreme-val {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   color: var(--text-primary);
   margin-top: 2px;
 }
 
 .extreme-time {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   color: var(--text-secondary);
 }
 
@@ -303,8 +317,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 900;
   color: var(--s6-blue);
 }
 
@@ -318,21 +332,21 @@ body {
 
 .solar-slot {
   background: #ffffff;
-  border: 1.5px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 4px;
 }
 
 .solar-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 900;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .solar-val {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 900;
   color: var(--text-primary);
   margin-top: 2px;
 }
@@ -342,13 +356,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
-  border: 2px solid var(--s6-yellow);
+  background: #ffff00;
+  border: 2px solid #000000;
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--s6-yellow);
+  font-size: 18px;
+  font-weight: 900;
+  color: #000000;
 }
 
 /* Moon Card */
@@ -374,24 +388,24 @@ body {
 }
 
 .moon-phase-name {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 900;
   color: var(--text-primary);
 }
 
 .moon-illum {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 800;
   color: var(--text-secondary);
 }
 
 .tide-cycle-tag {
   display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--s6-blue);
-  background: var(--s6-blue-light);
-  padding: 3px 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffffff;
+  background: var(--s6-blue);
+  padding: 4px 10px;
   border-radius: 6px;
   margin-top: 4px;
   align-self: flex-start;
@@ -400,15 +414,14 @@ body {
 /* Bottom Multi-Day Outlook */
 .outlook-section {
   background: var(--bg-card);
-  border: 2px solid var(--border-color);
+  border: 3px solid var(--border-color);
   border-radius: 16px;
   padding: 16px 24px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
 }
 
 .outlook-header {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 900;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -438,20 +451,20 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 8px;
   margin-bottom: 8px;
 }
 
 .day-title {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 900;
   color: var(--text-primary);
 }
 
 .day-date {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 800;
   color: var(--text-muted);
 }
 
@@ -470,26 +483,31 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .outlook-ext-type {
-  font-weight: 700;
+  font-weight: 900;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.outlook-ext-type.high { color: var(--s6-red); }
-.outlook-ext-type.low { color: var(--s6-blue); }
+.outlook-ext-type.high {
+  color: var(--s6-red);
+}
+
+.outlook-ext-type.low {
+  color: var(--s6-blue);
+}
 
 .outlook-ext-time {
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-muted);
 }
 
 .outlook-ext-val {
-  font-weight: 800;
+  font-weight: 900;
   color: var(--text-primary);
 }
 
@@ -498,10 +516,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1.5px solid var(--border-color);
+  border-top: 2px solid var(--border-color);
   padding-top: 12px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 800;
   color: var(--text-muted);
   letter-spacing: 0.3px;
 }
@@ -513,9 +531,10 @@ body {
 }
 
 .footer-badge {
-  background: #e2e8f0;
-  color: #334155;
+  background: #000000;
+  color: #ffffff;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 14px;
+  font-weight: 900;
 }

@@ -22,15 +22,15 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-# Spectra 6 Palette definition
-# 6 physical pigment colors: Black, White, Red, Yellow, Blue, Green
+# Spectra 6 Palette definition (Strict binary RGB values: 0 or 255 only)
+# 6 pure pigment colors: Black, White, Red, Yellow, Blue, Green
 SPECTRA6_PALETTE = [
     0, 0, 0,        # 0: Black
     255, 255, 255,  # 1: White
-    220, 20, 20,    # 2: Red
-    250, 215, 0,    # 3: Yellow
-    25, 75, 200,    # 4: Blue
-    25, 145, 45     # 5: Green
+    255, 0, 0,      # 2: Red
+    255, 255, 0,    # 3: Yellow
+    0, 0, 255,      # 4: Blue
+    0, 255, 0       # 5: Green
 ]
 # Pad palette to 256 colors (768 bytes) for PIL 'P' mode
 SPECTRA6_PALETTE_256 = SPECTRA6_PALETTE + [0] * (768 - len(SPECTRA6_PALETTE))
@@ -99,15 +99,15 @@ def build_svg_chart_data(data: Dict[str, Any], is_clean_graph: bool = True) -> D
 
     # Extrema callout pills
     extrema_svg = []
-    pill_offset = 48 if is_clean_graph else 26
-    pill_margin_x = 100 if is_clean_graph else 60
+    pill_offset = 60 if is_clean_graph else 34
+    pill_margin_x = 130 if is_clean_graph else 75
 
     for ext in data.get("today_extrema", []):
         cx = to_x(ext["hour"])
         cy = to_y(ext["height"])
         is_high = ext["is_high"]
         # Position pill above crest or below trough
-        pill_y = max(chart_top + 34, cy - pill_offset) if is_high else min(chart_bottom - 34, cy + pill_offset)
+        pill_y = max(chart_top + 60, cy - pill_offset) if is_high else min(chart_bottom - 50, cy + pill_offset)
         pill_x = min(chart_right - pill_margin_x, max(chart_left + pill_margin_x, cx))
 
         extrema_svg.append({
@@ -127,7 +127,7 @@ def build_svg_chart_data(data: Dict[str, Any], is_clean_graph: bool = True) -> D
             y_pos = to_y(float(level))
             if chart_top <= y_pos <= chart_bottom:
                 is_zero = (level == 0)
-                label = "0.0 MLLW" if is_zero else f"{level:+.1f} ft"
+                label = "0.0 ft" if is_zero else f"{level:+.1f} ft"
                 y_grids.append({
                     "y": round(y_pos, 1),
                     "label": label,
@@ -196,15 +196,15 @@ def find_headless_browser() -> Optional[str]:
 
 def dither_to_spectra6(rgb_image_path: str, output_path: str) -> None:
     """
-    Quantize an RGB image to the 6-color Spectra 6 palette using Floyd-Steinberg error diffusion.
-    Saves an indexed 'P' mode PNG optimized for e-paper screens.
+    Quantize an RGB image to the 6 pure primary colors (R,G,B values strictly 0 or 255)
+    with NO dithering (Image.Dither.NONE) for ultra-crisp, solid e-paper display.
     """
     img = Image.open(rgb_image_path).convert("RGB")
     palette_img = Image.new("P", (1, 1))
     palette_img.putpalette(SPECTRA6_PALETTE_256)
 
-    # Apply Floyd-Steinberg dithering
-    dithered = img.quantize(palette=palette_img, dither=Image.Dither.FLOYDSTEINBERG)
+    # Apply solid nearest-color palette quantization with ZERO dithering
+    dithered = img.quantize(palette=palette_img, dither=Image.Dither.NONE)
     dithered.save(output_path, "PNG", optimize=True)
 
 class TideCalendarRenderer:
