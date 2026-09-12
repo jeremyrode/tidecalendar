@@ -106,9 +106,14 @@ def build_svg_chart_data(data: Dict[str, Any], is_clean_graph: bool = True) -> D
         cx = to_x(ext["hour"])
         cy = to_y(ext["height"])
         is_high = ext["is_high"]
-        # Position pill above crest or below trough
-        pill_y = max(chart_top + 60, cy - pill_offset) if is_high else min(chart_bottom - 50, cy + pill_offset)
-        pill_x = min(chart_right - pill_margin_x, max(chart_left + pill_margin_x, cx))
+        if is_high:
+            pill_y = max(chart_top + 60, cy - pill_offset)
+            pill_x = min(chart_right - pill_margin_x, max(chart_left + pill_margin_x, cx))
+        else:
+            # Low tide: shift pill off to the side so it doesn't overlap the wave curve
+            side_shift = -130 if ext["hour"] < 12 else 130
+            pill_x = min(chart_right - 118, max(chart_left + 118, cx + side_shift))
+            pill_y = min(chart_bottom - 42, max(chart_top + 100, cy + 15))
 
         extrema_svg.append({
             "cx": round(cx, 1),

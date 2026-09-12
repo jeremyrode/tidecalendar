@@ -57,6 +57,12 @@
 
       <!-- Extrema Callout Pills on Curve (Extra Large Fonts: 36px / 26px) -->
       {% for ext in chart.extrema_svg %}
+        <!-- Connector line for low tides offset to the side -->
+        {% if not ext.is_high %}
+        <line x1="{{ ext.cx }}" y1="{{ ext.cy }}" x2="{{ ext.pill_x }}" y2="{{ ext.pill_y }}"
+              stroke="#0000ff" stroke-width="3" stroke-dasharray="6 4" />
+        {% endif %}
+
         <!-- Circle point on the wave -->
         <circle cx="{{ ext.cx }}" cy="{{ ext.cy }}" r="15"
                 fill="{{ '#ff0000' if ext.is_high else '#0000ff' }}"

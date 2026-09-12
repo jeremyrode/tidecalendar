@@ -102,6 +102,12 @@
 
           <!-- Extrema Callout Pills on the Curve -->
           {% for ext in chart.extrema_svg %}
+            <!-- Connector line for low tides offset to the side -->
+            {% if not ext.is_high %}
+            <line x1="{{ ext.cx }}" y1="{{ ext.cy }}" x2="{{ ext.pill_x }}" y2="{{ ext.pill_y }}"
+                  stroke="#0000ff" stroke-width="2" stroke-dasharray="4 3" />
+            {% endif %}
+
             <!-- Point on curve -->
             <circle cx="{{ ext.cx }}" cy="{{ ext.cy }}" r="8" fill="{{ '#ff0000' if ext.is_high else '#0000ff' }}" stroke="#ffffff" stroke-width="3" />
 
