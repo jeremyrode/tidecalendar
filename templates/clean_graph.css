@@ -1,0 +1,45 @@
+/* clean_graph.css - Pure, Full-Bleed Tide Chart for Seeed reTerminal E1004 (1600x1200) */
+
+:root {
+  --bg-color: #ffffff;
+  --text-dark: #000000;
+  --s6-blue: #1d4ed8;
+  --s6-yellow: #ca8a04;
+  --s6-yellow-bg: #fef08a;
+  --s6-red: #dc2626;
+  --border-light: #e2e8f0;
+  --border-dark: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 1600px;
+  height: 1200px;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fullscreen SVG Container */
+.chart-container {
+  width: 1600px;
+  height: 1200px;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+svg {
+  width: 1600px;
+  height: 1200px;
+  display: block;
+}

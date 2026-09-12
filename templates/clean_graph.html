@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ location_name }} Tide Chart</title>
+  <link rel="stylesheet" href="clean_graph.css">
+</head>
+<body>
+
+  <!-- Pure Full-Screen Tide Graph (No Header, Large Across-the-Room Fonts) -->
+  <main class="chart-container">
+    <svg viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Clean shadow for high-contrast pills -->
+        <filter id="cleanPillShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+        </filter>
+      </defs>
+
+      <!-- Chart Base Canvas (Pure White) -->
+      <rect x="{{ chart.chart_left }}" y="{{ chart.chart_top }}" width="{{ chart.chart_width }}" height="{{ chart.chart_height }}" fill="#ffffff" />
+
+      <!-- Night Shading Left (Pure White) -->
+      <rect x="{{ chart.chart_left }}" y="{{ chart.chart_top }}" width="{{ chart.sunrise_x - chart.chart_left }}" height="{{ chart.chart_height }}" fill="#ffffff" />
+
+      <!-- Daylight Background Shading (Vivid Spectra 6 Pale Yellow) -->
+      <rect x="{{ chart.sunrise_x }}" y="{{ chart.chart_top }}" width="{{ chart.sunset_x - chart.sunrise_x }}" height="{{ chart.chart_height }}" fill="#fef08a" />
+      <line x1="{{ chart.sunrise_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.sunrise_x }}" y2="{{ chart.chart_bottom }}" stroke="#ca8a04" stroke-width="4" stroke-dasharray="7 6"/>
+      <line x1="{{ chart.sunset_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.sunset_x }}" y2="{{ chart.chart_bottom }}" stroke="#ca8a04" stroke-width="4" stroke-dasharray="7 6"/>
+
+      <!-- Night Shading Right (Pure White) -->
+      <rect x="{{ chart.sunset_x }}" y="{{ chart.chart_top }}" width="{{ chart.chart_right - chart.sunset_x }}" height="{{ chart.chart_height }}" fill="#ffffff" />
+
+      <!-- Daylight Labels (Extra Large Across-the-Room Font) -->
+      <text x="{{ chart.sunrise_x + 16 }}" y="{{ chart.chart_top + 38 }}" font-size="24" font-weight="900" fill="#a16207" letter-spacing="0.5">SUNRISE {{ solar.sunrise_str }}</text>
+      <text x="{{ chart.sunset_x - 16 }}" y="{{ chart.chart_top + 38 }}" text-anchor="end" font-size="24" font-weight="900" fill="#a16207" letter-spacing="0.5">SUNSET {{ solar.sunset_str }}</text>
+
+      <!-- Horizontal Height Gridlines & Large Y-Axis Labels -->
+      {% for grid in chart.y_grids %}
+      <line x1="{{ chart.chart_left }}" y1="{{ grid.y }}" x2="{{ chart.chart_right }}" y2="{{ grid.y }}"
+            stroke="{{ '#0f172a' if grid.is_zero else '#e2e8f0' }}"
+            stroke-width="{{ '4.5' if grid.is_zero else '2' }}"
+            stroke-dasharray="{{ '10 8' if grid.is_zero else 'none' }}" />
+      <text x="{{ chart.chart_left - 22 }}" y="{{ grid.y + 10 }}" text-anchor="end"
+            font-size="{{ '32' if grid.is_zero else '30' }}"
+            font-weight="900"
+            fill="{{ '#000000' if grid.is_zero else '#334155' }}">{{ grid.label }}</text>
+      {% endfor %}
+
+      <!-- Vertical Time Gridlines & Large X-Axis Labels -->
+      {% for tick in chart.x_ticks %}
+      <line x1="{{ tick.x }}" y1="{{ chart.chart_top }}" x2="{{ tick.x }}" y2="{{ chart.chart_bottom }}" stroke="#e2e8f0" stroke-width="2" />
+      <text x="{{ tick.x }}" y="{{ chart.chart_bottom + 65 }}" text-anchor="middle" font-size="30" font-weight="900" fill="#000000">{{ tick.label }}</text>
+      {% endfor %}
+
+      <!-- Wave Area Fill -->
+      <path d="{{ chart.area_path }}" fill="#dbeafe" opacity="0.6" />
+
+      <!-- Main Wave Harmonic Curve (Thick, Bold Blue) -->
+      <path d="{{ chart.line_path }}" fill="none" stroke="#1d4ed8" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Current Time Indicator -->
+      {% if chart.now_x %}
+      <line x1="{{ chart.now_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.now_x }}" y2="{{ chart.chart_bottom }}" stroke="#dc2626" stroke-width="4" stroke-dasharray="8 6" />
+      <circle cx="{{ chart.now_x }}" cy="{{ chart.now_y }}" r="12" fill="#dc2626" stroke="#ffffff" stroke-width="3.5" />
+      <!-- Current Level Badge (Large) -->
+      <g transform="translate({{ chart.now_x }}, {{ chart.now_y - 38 }})" filter="url(#cleanPillShadow)">
+        <rect x="-95" y="-26" width="190" height="52" rx="12" fill="#ffffff" stroke="#dc2626" stroke-width="4"/>
+        <text x="0" y="9" text-anchor="middle" font-size="25" font-weight="900" fill="#dc2626">NOW {{ current_water_level_str }}</text>
+      </g>
+      {% endif %}
+
+      <!-- Extrema Callout Pills on Curve (Extra Large Fonts) -->
+      {% for ext in chart.extrema_svg %}
+        <!-- Circle point on the wave -->
+        <circle cx="{{ ext.cx }}" cy="{{ ext.cy }}" r="12"
+                fill="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}"
+                stroke="#ffffff" stroke-width="3.5" />
+
+        <!-- Pill Box (Large, High-Contrast) -->
+        <g transform="translate({{ ext.pill_x }}, {{ ext.pill_y }})" filter="url(#cleanPillShadow)">
+          <rect x="-92" y="-30" width="184" height="60" rx="14"
+                fill="#ffffff"
+                stroke="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}"
+                stroke-width="4" />
+          <text x="0" y="-4" text-anchor="middle" font-size="24" font-weight="900"
+                fill="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}">
+            {{ '▲' if ext.is_high else '▼' }} {{ ext.height_str }}
+          </text>
+          <text x="0" y="20" text-anchor="middle" font-size="20" font-weight="900" fill="#000000">
+            {{ ext.time_str }}
+          </text>
+        </g>
+      {% endfor %}
+    </svg>
+  </main>
+
+</body>
+</html>

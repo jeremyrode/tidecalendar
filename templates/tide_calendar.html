@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Encinitas Tide Calendar • reTerminal E1004</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-tag">
+        <span class="tag-dot"></span>
+        <span>NOAA CO-OPS STATION {{ station_id }} • PACIFIC COAST</span>
+      </div>
+      <h1 class="location-title">{{ location_name }}</h1>
+      <div class="location-sub">{{ sub_name }} • Datum: {{ datum }}</div>
+    </div>
+
+    <div class="header-center">
+      <div class="date-main">{{ today_date }}</div>
+      <div class="date-sub">Daily Marine & Surf Tide Forecast</div>
+    </div>
+
+    <div class="header-right">
+      <div class="current-badge">
+        <div>
+          <div class="badge-level-label">Current Water Level</div>
+          <div class="badge-level-val">{{ current_water_level_str }}</div>
+        </div>
+        <div class="badge-trend">{{ current_trend }}</div>
+      </div>
+      {% if next_event %}
+      <div class="next-tide-text">
+        Next: <strong>{{ next_event.type }} {{ next_event.height_str }}</strong> at {{ next_event.time_str }} ({{ next_event.in_str }})
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Main Hero Section -->
+  <main class="main-section">
+    <!-- Hero 24-Hour Tide Chart Card -->
+    <section class="chart-card">
+      <div class="chart-header">
+        <h2 class="chart-title">24-Hour Harmonic Tide Prediction</h2>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-swatch swatch-daylight"></span>
+            <span>Daylight ({{ solar.sunrise_str }} – {{ solar.sunset_str }})</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch swatch-curve"></span>
+            <span>Water Level (MLLW)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch swatch-mllw"></span>
+            <span>0.0 MLLW Baseline</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero SVG Chart -->
+      <div class="chart-svg-container">
+        <svg viewBox="0 0 1060 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Linear gradient for smooth water fill -->
+            <linearGradient id="tideFill" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2563eb" stop-opacity="0.35"/>
+              <stop offset="60%" stop-color="#60a5fa" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#93c5fd" stop-opacity="0.08"/>
+            </linearGradient>
+
+            <!-- Shadow filter for high/low callout pills -->
+            <filter id="pillShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+            </filter>
+          </defs>
+
+          <!-- Base Background for Chart -->
+          <rect x="{{ chart.chart_left }}" y="{{ chart.chart_top }}" width="{{ chart.chart_width }}" height="{{ chart.chart_height }}" fill="#ffffff" />
+
+          <!-- Daylight Background Shading (Clean Pale Yellow) -->
+          <rect x="{{ chart.sunrise_x }}" y="{{ chart.chart_top }}" width="{{ chart.sunset_x - chart.sunrise_x }}" height="{{ chart.chart_height }}" fill="#fef08a" />
+          <line x1="{{ chart.sunrise_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.sunrise_x }}" y2="{{ chart.chart_bottom }}" stroke="#ca8a04" stroke-width="2" stroke-dasharray="4 3"/>
+          <line x1="{{ chart.sunset_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.sunset_x }}" y2="{{ chart.chart_bottom }}" stroke="#ca8a04" stroke-width="2" stroke-dasharray="4 3"/>
+
+          <!-- Daylight Labels -->
+          <text x="{{ chart.sunrise_x + 8 }}" y="{{ chart.chart_top + 18 }}" font-size="12" font-weight="800" fill="#a16207">SUNRISE {{ solar.sunrise_str }}</text>
+          <text x="{{ chart.sunset_x - 8 }}" y="{{ chart.chart_top + 18 }}" text-anchor="end" font-size="12" font-weight="800" fill="#a16207">SUNSET {{ solar.sunset_str }}</text>
+
+          <!-- Horizontal Height Gridlines & Labels -->
+          {% for grid in chart.y_grids %}
+          <line x1="{{ chart.chart_left }}" y1="{{ grid.y }}" x2="{{ chart.chart_right }}" y2="{{ grid.y }}"
+                stroke="{{ '#0f172a' if grid.is_zero else '#cbd5e1' }}"
+                stroke-width="{{ '2.5' if grid.is_zero else '1' }}"
+                stroke-dasharray="{{ '6 4' if grid.is_zero else 'none' }}" />
+          <text x="{{ chart.chart_left - 12 }}" y="{{ grid.y + 4 }}" text-anchor="end" font-size="13" font-weight="{{ '800' if grid.is_zero else '700' }}" fill="{{ '#0f172a' if grid.is_zero else '#475569' }}">{{ grid.label }}</text>
+          {% endfor %}
+
+          <!-- Vertical Time Gridlines & Hour Labels -->
+          {% for tick in chart.x_ticks %}
+          <line x1="{{ tick.x }}" y1="{{ chart.chart_top }}" x2="{{ tick.x }}" y2="{{ chart.chart_bottom }}" stroke="#e2e8f0" stroke-width="1" />
+          <text x="{{ tick.x }}" y="{{ chart.chart_bottom + 22 }}" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">{{ tick.label }}</text>
+          {% endfor %}
+
+          <!-- Wave Area Fill (Clean Pale Blue) -->
+          <path d="{{ chart.area_path }}" fill="#dbeafe" opacity="0.6" />
+
+          <!-- Wave Stroke Line -->
+          <path d="{{ chart.line_path }}" fill="none" stroke="#1d4ed8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+
+          <!-- Current Time Indicator -->
+          {% if chart.now_x %}
+          <line x1="{{ chart.now_x }}" y1="{{ chart.chart_top }}" x2="{{ chart.now_x }}" y2="{{ chart.chart_bottom }}" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="4 4" />
+          <circle cx="{{ chart.now_x }}" cy="{{ chart.now_y }}" r="7" fill="#dc2626" stroke="#ffffff" stroke-width="2.5" />
+          <!-- Tag above or below current point -->
+          <g transform="translate({{ chart.now_x }}, {{ chart.now_y - 20 }})">
+            <rect x="-44" y="-12" width="88" height="22" rx="6" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+            <text x="0" y="3" text-anchor="middle" font-size="11" font-weight="900" fill="#dc2626">NOW {{ current_water_level_str }}</text>
+          </g>
+          {% endif %}
+
+          <!-- Extrema Callout Pills on the Curve -->
+          {% for ext in chart.extrema_svg %}
+            <!-- Point on curve -->
+            <circle cx="{{ ext.cx }}" cy="{{ ext.cy }}" r="6" fill="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}" stroke="#ffffff" stroke-width="2" />
+
+            <!-- Pill Box -->
+            <g transform="translate({{ ext.pill_x }}, {{ ext.pill_y }})" filter="url(#pillShadow)">
+              <rect x="-56" y="-14" width="112" height="28" rx="8"
+                    fill="#ffffff" stroke="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}" stroke-width="2.5" />
+              <text x="0" y="-1" text-anchor="middle" font-size="12" font-weight="900" fill="{{ '#dc2626' if ext.is_high else '#1d4ed8' }}">
+                {{ '▲' if ext.is_high else '▼' }} {{ ext.height_str }}
+              </text>
+              <text x="0" y="10" text-anchor="middle" font-size="10" font-weight="800" fill="#0f172a">
+                {{ ext.time_str }}
+              </text>
+            </g>
+          {% endfor %}
+        </svg>
+      </div>
+    </section>
+
+    <!-- Sidebar Cards -->
+    <aside class="sidebar">
+      <!-- Card 1: Today's Extremes -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <span>Today's Extrema</span>
+          <span style="color: var(--s6-blue);">NOAA Scripps</span>
+        </div>
+        <div class="extremes-grid">
+          {% for ext in today_extrema %}
+          <div class="extreme-item {{ 'high' if ext.is_high else 'low' }}">
+            <div class="extreme-type {{ 'high' if ext.is_high else 'low' }}">
+              <span>{{ ext.type }} Tide</span>
+              <span>{{ '▲' if ext.is_high else '▼' }}</span>
+            </div>
+            <div class="extreme-val">{{ ext.height_str }}</div>
+            <div class="extreme-time">{{ ext.time_str }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="range-banner">
+          <span>Daily Tidal Range</span>
+          <span>{{ today_range_str }}</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Sun & Daylight -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <span>Sun & Twilight</span>
+          <span style="color: var(--s6-yellow);">Encinitas</span>
+        </div>
+        <div class="solar-grid">
+          <div class="solar-slot">
+            <div class="solar-label">First Light</div>
+            <div class="solar-val">{{ solar.dawn_str }}</div>
+          </div>
+          <div class="solar-slot">
+            <div class="solar-label">Sunrise</div>
+            <div class="solar-val">{{ solar.sunrise_str }}</div>
+          </div>
+          <div class="solar-slot">
+            <div class="solar-label">Sunset</div>
+            <div class="solar-val">{{ solar.sunset_str }}</div>
+          </div>
+          <div class="solar-slot">
+            <div class="solar-label">Last Light</div>
+            <div class="solar-val">{{ solar.dusk_str }}</div>
+          </div>
+        </div>
+        <div class="daylight-banner">
+          <span>Total Daylight Hours</span>
+          <span>{{ solar.daylight_str }}</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Lunar Cycle -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <span>Lunar Cycle</span>
+          <span>Age: {{ moon.age_days }}d</span>
+        </div>
+        <div class="moon-container">
+          <div class="moon-svg-wrap">
+            {{ moon.svg_markup | safe }}
+          </div>
+          <div class="moon-info">
+            <div class="moon-phase-name">{{ moon.phase_name }}</div>
+            <div class="moon-illum">{{ moon.illumination_pct }}% Illumination</div>
+            <div class="tide-cycle-tag">{{ moon.tide_type }}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Multi-Day Outlook -->
+  <section class="outlook-section">
+    <div class="outlook-header">
+      <span>5-Day Ocean Tide Outlook • Encinitas Coast</span>
+      <span>Scripps Institution Wharf Reference</span>
+    </div>
+    <div class="outlook-grid">
+      {% for day in outlook %}
+      <div class="outlook-day-card">
+        <div class="outlook-day-header">
+          <div>
+            <div class="day-title">{{ day.day_name }}</div>
+            <div class="day-date">{{ day.date_str }}</div>
+          </div>
+          <div class="outlook-moon-mini">
+            {{ day.moon_svg | safe }}
+          </div>
+        </div>
+        <div class="outlook-extrema-list">
+          {% for ext in day.extrema %}
+          <div class="outlook-ext-row">
+            <span class="outlook-ext-type {{ 'high' if ext.is_high else 'low' }}">
+              {{ '▲' if ext.is_high else '▼' }} {{ ext.type }}
+            </span>
+            <span class="outlook-ext-time">{{ ext.time_str }}</span>
+            <span class="outlook-ext-val">{{ ext.height_str }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-left">
+      <span class="footer-badge">MLLW DATUM</span>
+      <span>Station 9410230 (La Jolla / Encinitas)</span>
+      <span>•</span>
+      <span>Coordinates: 33.037° N, 117.292° W</span>
+    </div>
+    <div>
+      <span>Seeed reTerminal E1004 • 13.3″ Spectra 6 E-Paper</span>
+    </div>
+    <div>
+      <span>Generated {{ now_time_str }} • Auto-Refreshes Daily</span>
+    </div>
+  </footer>
+
+</body>
+</html>

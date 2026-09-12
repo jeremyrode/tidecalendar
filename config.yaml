@@ -1,0 +1,39 @@
+# Tide Calendar Configuration for Encinitas, CA
+# Target: Seeed reTerminal E1004 (13.3" Spectra 6 e-Paper)
+
+display:
+  orientation: "landscape"
+  width: 1600
+  height: 1200
+  # View mode: "clean_graph" (pure, clean full-screen tide graph) or "dashboard" (multi-widget layout)
+  view_mode: "clean_graph"
+  # Color mode: "spectra6" (6-color dithered) or "rgb" (24-bit full color)
+  palette_mode: "spectra6"
+
+location:
+  name: "Encinitas, California"
+  sub_name: "Swami's • Moonlight Beach • San Elijo"
+  latitude: 33.037
+  longitude: -117.292
+  timezone: "America/Los_Angeles"
+
+noaa:
+  # Station 9410230: La Jolla (Scripps Institution Wharf) - official reference station for Encinitas
+  station_id: "9410230"
+  station_name: "La Jolla (Scripps Pier)"
+  datum: "MLLW"       # Mean Lower Low Water (standard nautical datum)
+  units: "english"    # feet (use "metric" for meters)
+  time_zone: "lst_ldt" # Local Standard / Local Daylight Time
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  # Refresh interval sent to epd-photoframe in HTTP 'Refresh:' header (in seconds)
+  # 14400 = 4 hours; 86400 = 24 hours (daily)
+  refresh_interval_seconds: 14400
+  # Target wake time (e.g. daily at 04:00 AM) if dynamic scheduling is preferred
+  daily_refresh_hour: 4
+
+cache:
+  cache_dir: ".cache"
+  cache_ttl_hours: 2
