@@ -14,6 +14,9 @@
       <!-- Chart Base Canvas (Pure White: 255, 255, 255) -->
       <rect x="{{ chart.chart_left }}" y="{{ chart.chart_top }}" width="{{ chart.chart_width }}" height="{{ chart.chart_height }}" fill="#ffffff" />
 
+      <!-- Upper Left Corner Date Header -->
+      <text x="30" y="48" font-size="32" font-weight="900" fill="#000000" letter-spacing="0.5">{{ today_date }}</text>
+
       <!-- Night Shading Left (Pure White: 255, 255, 255) -->
       <rect x="{{ chart.chart_left }}" y="{{ chart.chart_top }}" width="{{ chart.sunrise_x - chart.chart_left }}" height="{{ chart.chart_height }}" fill="#ffffff" />
 
