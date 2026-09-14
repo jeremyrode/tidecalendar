@@ -139,7 +139,7 @@ class TideServerHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "image/png")
             self.send_header("Content-Length", str(len(img_data)))
-            self.send_header("Refresh", str(refresh_sec))
+            self.send_header("Refresh", f"{refresh_sec}; url={path}")
             self.send_header("X-Epd-Next-Refresh-Sec", str(refresh_sec))
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.end_headers()
