@@ -99,11 +99,13 @@ class TideServerHandler(BaseHTTPRequestHandler):
                   f"Temp: {telemetry.get('temp', 'N/A')}C | "
                   f"Humidity: {telemetry.get('humidity', 'N/A')}%")
 
+        force_refresh = ("force" in query) or ("reload" in query)
+
         # 1. Main image endpoints for reTerminal E1004 (epd-photoframe)
         if path in ["/screen/encinitas-tide", "/screen/tide.bmp", "/screen/tide.png", "/screen", "/tide.png", "/tide.bmp"]:
             config = load_config()
             palette_mode = config.get("display", {}).get("palette_mode", "spectra6")
-            res = self._ensure_fresh_image()
+            res = self._ensure_fresh_image(force=force_refresh)
 
             img_path = res["spectra6_bmp"] if palette_mode == "spectra6" else res["rgb_png"]
             if not os.path.exists(img_path):
@@ -130,7 +132,7 @@ class TideServerHandler(BaseHTTPRequestHandler):
 
         # 2. Raw 24-bit RGB image endpoint
         if path in ["/screen/raw.png", "/tide_rgb.png"]:
-            res = self._ensure_fresh_image()
+            res = self._ensure_fresh_image(force=force_refresh)
             img_path = res["rgb_png"]
             if not os.path.exists(img_path):
                 self.send_error(500, "RGB image not found")
@@ -150,7 +152,7 @@ class TideServerHandler(BaseHTTPRequestHandler):
 
         # 3. Direct HTML preview in browser
         if path in ["/", "/preview", "/index.html"]:
-            res = self._ensure_fresh_image()
+            res = self._ensure_fresh_image(force=force_refresh)
             html_path = res["html"]
             if not os.path.exists(html_path):
                 self.send_error(500, "HTML preview not found")
