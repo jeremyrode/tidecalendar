@@ -57,7 +57,7 @@ class TideServerHandler(BaseHTTPRequestHandler):
         now = time.time()
         with SERVER_STATE["rendering_lock"]:
             rgb_path = os.path.abspath(os.path.join("output", "tide_calendar_1600x1200.png"))
-            spectra6_path = os.path.abspath(os.path.join("output", "tide_calendar_spectra6.png"))
+            spectra6_path = os.path.abspath(os.path.join("output", "tide_calendar_spectra6.bmp"))
             html_path = os.path.abspath(os.path.join("output", "tide_calendar.html"))
 
             is_fresh = (
@@ -76,7 +76,7 @@ class TideServerHandler(BaseHTTPRequestHandler):
             return {
                 "html": html_path,
                 "rgb_png": rgb_path,
-                "spectra6_png": spectra6_path
+                "spectra6_bmp": spectra6_path
             }
 
     def do_GET(self) -> None:
@@ -100,12 +100,12 @@ class TideServerHandler(BaseHTTPRequestHandler):
                   f"Humidity: {telemetry.get('humidity', 'N/A')}%")
 
         # 1. Main image endpoints for reTerminal E1004 (epd-photoframe)
-        if path in ["/screen/encinitas-tide", "/screen/tide.png", "/screen", "/tide.png"]:
+        if path in ["/screen/encinitas-tide", "/screen/tide.bmp", "/screen/tide.png", "/screen", "/tide.png", "/tide.bmp"]:
             config = load_config()
             palette_mode = config.get("display", {}).get("palette_mode", "spectra6")
             res = self._ensure_fresh_image()
 
-            img_path = res["spectra6_png"] if palette_mode == "spectra6" else res["rgb_png"]
+            img_path = res["spectra6_bmp"] if palette_mode == "spectra6" else res["rgb_png"]
             if not os.path.exists(img_path):
                 self.send_error(500, "Image file not found")
                 return
@@ -115,8 +115,10 @@ class TideServerHandler(BaseHTTPRequestHandler):
 
             refresh_sec = self._get_refresh_seconds()
 
+            content_type = "image/bmp" if img_path.endswith(".bmp") else "image/png"
+
             self.send_response(200)
-            self.send_header("Content-Type", "image/png")
+            self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(img_data)))
             # The critical header for epd-photoframe sleep management:
             self.send_header("Refresh", f"{refresh_sec}; url={path}")

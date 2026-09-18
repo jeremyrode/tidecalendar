@@ -210,7 +210,9 @@ def dither_to_spectra6(rgb_image_path: str, output_path: str) -> None:
 
     # Apply solid nearest-color palette quantization with ZERO dithering
     dithered = img.quantize(palette=palette_img, dither=Image.Dither.NONE)
-    dithered.save(output_path, "PNG", optimize=True)
+    # Convert to 24-bit RGB and save as BMP so esp32-photoframe bypasses dithering
+    dithered_rgb = dithered.convert("RGB")
+    dithered_rgb.save(output_path, "BMP")
 
 class TideCalendarRenderer:
     def __init__(self, config_path: str = "config.yaml"):
@@ -283,14 +285,14 @@ class TideCalendarRenderer:
         if res.returncode != 0 or not os.path.exists(rgb_png_path):
             raise RuntimeError(f"Browser screenshot failed: {res.stderr}")
 
-        # 3. Dither to Spectra 6 Palette
-        spectra6_png_path = os.path.abspath(os.path.join(self.output_dir, "tide_calendar_spectra6.png"))
-        dither_to_spectra6(rgb_png_path, spectra6_png_path)
+        # 3. Quantize to Spectra 6 Palette and save as BMP
+        spectra6_bmp_path = os.path.abspath(os.path.join(self.output_dir, "tide_calendar_spectra6.bmp"))
+        dither_to_spectra6(rgb_png_path, spectra6_bmp_path)
 
         return {
             "html": html_path,
             "rgb_png": rgb_png_path,
-            "spectra6_png": spectra6_png_path
+            "spectra6_bmp": spectra6_bmp_path
         }
 
 if __name__ == "__main__":
@@ -299,4 +301,4 @@ if __name__ == "__main__":
     res = renderer.render_image()
     print(f"Generated HTML: {res['html']}")
     print(f"Generated RGB PNG: {res['rgb_png']} ({os.path.getsize(res['rgb_png']) / 1024:.1f} KB)")
-    print(f"Generated Spectra 6 PNG: {res['spectra6_png']} ({os.path.getsize(res['spectra6_png']) / 1024:.1f} KB)")
+    print(f"Generated Spectra 6 BMP: {res['spectra6_bmp']} ({os.path.getsize(res['spectra6_bmp']) / 1024:.1f} KB)")
