@@ -199,10 +199,12 @@ def find_headless_browser() -> Optional[str]:
 
     return None
 
-def dither_to_spectra6(rgb_image_path: str, output_path: str) -> None:
+def dither_to_spectra6(rgb_image_path: str, output_path: str, rotation: int = 0) -> None:
     """
     Quantize an RGB image to the 6 pure primary colors (R,G,B values strictly 0 or 255)
     with NO dithering (Image.Dither.NONE) for ultra-crisp, solid e-paper display.
+    Rotates the output image by the specified degrees (e.g. 270 for 90 deg clockwise)
+    to match the physical orientation of portrait e-paper panels (e.g. 1200x1600 on reTerminal E1004).
     """
     img = Image.open(rgb_image_path).convert("RGB")
     palette_img = Image.new("P", (1, 1))
@@ -210,8 +212,18 @@ def dither_to_spectra6(rgb_image_path: str, output_path: str) -> None:
 
     # Apply solid nearest-color palette quantization with ZERO dithering
     dithered = img.quantize(palette=palette_img, dither=Image.Dither.NONE)
-    # Convert to 24-bit RGB and save as BMP so esp32-photoframe bypasses dithering
+    # Convert to 24-bit RGB
     dithered_rgb = dithered.convert("RGB")
+
+    # Rotate BMP if requested
+    if rotation in (270, -90):
+        dithered_rgb = dithered_rgb.transpose(Image.Transpose.ROTATE_270)
+    elif rotation in (90, -270):
+        dithered_rgb = dithered_rgb.transpose(Image.Transpose.ROTATE_90)
+    elif rotation in (180, -180):
+        dithered_rgb = dithered_rgb.transpose(Image.Transpose.ROTATE_180)
+
+    # Save as 24-bit BMP so esp32-photoframe bypasses dithering
     dithered_rgb.save(output_path, "BMP")
 
 class TideCalendarRenderer:
@@ -219,6 +231,7 @@ class TideCalendarRenderer:
         self.config = load_config(config_path)
         self.width = self.config["display"]["width"]
         self.height = self.config["display"]["height"]
+        self.rotation = int(self.config.get("display", {}).get("rotation", 270))
         self.output_dir = "output"
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -287,7 +300,7 @@ class TideCalendarRenderer:
 
         # 3. Quantize to Spectra 6 Palette and save as BMP
         spectra6_bmp_path = os.path.abspath(os.path.join(self.output_dir, "tide_calendar_spectra6.bmp"))
-        dither_to_spectra6(rgb_png_path, spectra6_bmp_path)
+        dither_to_spectra6(rgb_png_path, spectra6_bmp_path, rotation=self.rotation)
 
         return {
             "html": html_path,
